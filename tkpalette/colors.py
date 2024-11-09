@@ -1,4 +1,9 @@
+from typing import Tuple, Union
+
 class COLOR:
+    """
+    A class to represent and manage colors in hex and RGB formats.
+    """
     black = '#000000'
     white = '#FFFFFF'
     red = '#FF0000'
@@ -112,3 +117,104 @@ class COLOR:
     midnightblue = '#191970'
     mistyrose = '#FFE4E1'
     oldlace = '#FDF5E6'
+
+    # Initialisation
+    def __init__(self, color: Union[str, Tuple[int, int, int]]) -> None:
+        """
+        Initialize a COLOR instance with a color in hex or RGB format.
+
+        Args:
+            color (Union[str, Tuple[int, int, int]]): A hex color string (e.g., "#FF5733") 
+                                                     or an RGB tuple (e.g., (255, 87, 51)).
+
+        Raises:
+            ValueError: If the color format is invalid.
+        """
+        self.color = self._validate_color(color)
+
+    # Method to validate the color format
+    def _validate_color(self, color: Union[str, Tuple[int, int, int]]) -> str:
+        """
+        Validate the color format and convert to hex if needed.
+
+        Args:
+            color (Union[str, Tuple[int, int, int]]): The color to validate.
+
+        Returns:
+            str: A valid hex color string.
+
+        Raises:
+            ValueError: If the input color format is invalid.
+        """
+        if isinstance(color, str) and color.startswith("#") and len(color) in {4, 7}:
+            return color  # Valid hex color
+        elif isinstance(color, tuple) and len(color) == 3 and all(0 <= c <= 255 for c in color):
+            return self.rgb_to_hex(color)  # Convert RGB to hex
+        else:
+            raise ValueError("Invalid color format. Use hex ('#RRGGBB' or '#RGB') or RGB tuple (e.g., (255, 255, 255)).")
+
+    # Static method to convert RGB to hex
+    @staticmethod
+    def rgb_to_hex(rgb: Tuple[int, int, int]) -> str:
+        """
+        Convert an RGB tuple to a hex color string.
+
+        Args:
+            rgb (Tuple[int, int, int]): RGB color values (0-255).
+
+        Returns:
+            str: A hex color string in the format '#RRGGBB'.
+        """
+        return "#{:02x}{:02x}{:02x}".format(*rgb)
+
+    # Static method to convert hex to RGB
+    @staticmethod
+    def hex_to_rgb(hex_color: str) -> Tuple[int, int, int]:
+        """
+        Convert a hex color string to an RGB tuple.
+
+        Args:
+            hex_color (str): A hex color string in the format '#RRGGBB' or '#RGB'.
+
+        Returns:
+            Tuple[int, int, int]: RGB color values (0-255).
+
+        Raises:
+            ValueError: If the hex color format is invalid.
+        """
+        hex_color = hex_color.lstrip("#")
+        if len(hex_color) not in {3, 6}:
+            raise ValueError("Invalid hex format. Use '#RRGGBB' or '#RGB'.")
+        if len(hex_color) == 3:  # Expand shorthand hex (e.g., "#FFF" -> "#FFFFFF")
+            hex_color = "".join([c*2 for c in hex_color])
+        return tuple(int(hex_color[i:i+2], 16) for i in (0, 2, 4))
+
+    # Method to get the color in RGB format
+    def as_rgb(self) -> Tuple[int, int, int]:
+        """
+        Return the color as an RGB tuple.
+
+        Returns:
+            Tuple[int, int, int]: RGB color values (0-255).
+        """
+        return self.hex_to_rgb(self.color)
+
+    # Method to get the color in hex format
+    def as_hex(self) -> str:
+        """
+        Return the color as a hex string.
+
+        Returns:
+            str: Hex color string in the format '#RRGGBB'.
+        """
+        return self.color
+
+    # Represention
+    def __repr__(self) -> str:
+        """
+        Return a string representation of the COLOR instance.
+
+        Returns:
+            str: A string in the format "COLOR('#RRGGBB')".
+        """
+        return f"COLOR('{self.color}')"
