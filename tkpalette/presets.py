@@ -1,5 +1,5 @@
 from typing import Dict, List
-from colors import COLOR # Import the COLOR class
+from .colors import COLOR # Import the COLOR class
 
 class Palette:
     """
